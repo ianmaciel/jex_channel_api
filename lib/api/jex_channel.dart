@@ -41,4 +41,22 @@ class JExChannel {
     _isLogged = response.success;
     return _isLogged;
   }
+
+  Future<String> getAppointments() async {
+    const String endpoint =
+        'dwr/call/plaincall/ApontamentoTimesheetAjax.getDadosAgendaPorComponenteAgenda.dwr';
+
+    if (!isLogged) {
+      throw Exception('Unauthenticated');
+    }
+
+    Response response = await Requests.post(
+      '$baseAddress/$endpoint',
+      body:
+          'callCount=1\\nwindowName=c0-param2\\nc0-scriptName=ApontamentoTimesheetAjax\\nc0-methodName=getDadosAgendaPorComponenteAgenda\\nc0-id=0\\nc0-e1=null:null\\nc0-param0=Object_Object:{idUsuario:reference:c0-e1}\\nc0-param1=date:1614564154087\\nc0-param2=date:1615168954087\\nbatchId=16\\ninstanceId=0\\npage=%2Fchannel%2Fapontamento.do%3Faction%3DnovoApontamento\\nscriptSessionId=hK3V2fmV\$8r6dsNE4oU7emZTWsn/606e9xn-IbkKjqMWr\\n',
+      bodyEncoding: RequestBodyEncoding.PlainText,
+    );
+
+    return response.content();
+  }
 }
