@@ -23,6 +23,8 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
+import 'package:jex_channel_api/model/jex_day_model.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'jex_model.g.dart';
@@ -133,13 +135,16 @@ class JExModel {
   // }
 
   @JsonKey(name: 'dias')
-  final List<dynamic> days;
+  final List<JExDayModel> days;
 
-  @JsonKey(name: 'inicioFormatado')
+  @JsonKey(name: 'inicioFormatado', fromJson: parseDateTime)
   final DateTime formatedStart;
 
-  @JsonKey(name: 'fimFormatado')
+  @JsonKey(name: 'fimFormatado', fromJson: parseDateTime)
   final DateTime formatedEnd;
+
+  static DateTime parseDateTime(String date) =>
+      DateFormat('dd/MM/yyyy').parse(date);
 
   ///
   /// The JExperts answer is a JS-Object, not a JSON.
