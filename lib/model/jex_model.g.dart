@@ -8,9 +8,11 @@ part of 'jex_model.dart';
 
 JExModel _$JExModelFromJson(Map<String, dynamic> json) {
   return JExModel(
-    days: json['dias'] as List<dynamic>,
-    formatedStart: DateTime.parse(json['inicioFormatado'] as String),
-    formatedEnd: DateTime.parse(json['fimFormatado'] as String),
+    days: (json['dias'] as List<dynamic>)
+        .map((e) => JExDayModel.fromJson(e as Map<String, dynamic>))
+        .toList(),
+    formatedStart: JExModel.parseDateTime(json['inicioFormatado'] as String),
+    formatedEnd: JExModel.parseDateTime(json['fimFormatado'] as String),
   );
 }
 

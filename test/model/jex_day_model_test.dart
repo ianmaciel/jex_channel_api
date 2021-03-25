@@ -22,29 +22,26 @@
 
 import 'package:test/test.dart';
 
-import 'package:jex_channel_api/model/jex_model.dart';
-import 'fixtures/jex_model.fixture.dart';
+import 'package:jex_channel_api/model/jex_day_model.dart';
 
 void main() {
-  group('JExperts model', () {
-    test('should add quotes on dummy js-object', () {
-      const String jsObject =
-          '{name : aName, hobby : [fishing, playing_guitar]}';
-      const String expected =
-          '{"name" : "aName", "hobby" : ["fishing", "playing_guitar"]}';
-
-      String stringified = JExModel.stringify(jsObject);
-      expect(stringified, expected);
-    });
-    test('should add quotes on jexperts response js-object', () {
-      String stringified = JExModel.stringify(JExModelFixture.jsObject);
-      expect(stringified, JExModelFixture.expectedJson);
-    });
-    test('should convert the json', () {
-      JExModel jexModel = JExModel.fromString(JExModelFixture.jsObject);
-      expect(jexModel.formatedStart, DateTime(2021, 2, 28));
-      expect(jexModel.formatedEnd, DateTime(2021, 3, 7));
-      expect(jexModel.days[0].day, DateTime(2021, 2, 28));
+  group('JExperts day model', () {
+    test('should parse 00:00 format (HH:mm)', () {
+      expect(JExDayModel.parseHHMM('00:00'), Duration(hours: 0, minutes: 0));
+      expect(JExDayModel.parseHHMM('01:00'), Duration(hours: 1, minutes: 0));
+      expect(JExDayModel.parseHHMM('01:30'), Duration(hours: 1, minutes: 30));
+      expect(JExDayModel.parseHHMM('60:59'), Duration(hours: 60, minutes: 59));
+      expect(JExDayModel.parseHHMM('99:59'), Duration(hours: 99, minutes: 59));
+      expect(JExDayModel.parseHHMM('00:60'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('100:00'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('0:00'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('0:100'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('0:0'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('0:'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM(':0'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM(':'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('6021'), Duration(hours: 0));
+      expect(JExDayModel.parseHHMM('00'), Duration(hours: 0));
     });
   });
 }
