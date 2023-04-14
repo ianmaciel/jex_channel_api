@@ -21,7 +21,6 @@
  */
 
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 
 import 'package:jex_channel_api/model/jex_model.dart';
 
@@ -41,25 +40,19 @@ class ResponseParser {
   final String jsCode;
   ResponseParser(this.jsCode);
 
-  @visibleForTesting
   List<String> getLines() => jsCode.split('\n');
 
-  @visibleForTesting
   String getHandleCallbackLine(List<String> lines) =>
       lines.firstWhere((String line) => line.startsWith('r.handleCallback('));
 
-  @visibleForTesting
   String extractBodyContent(String cbLine) =>
       cbLine.substring(cbLine.indexOf('(') + 1, cbLine.lastIndexOf(')'));
 
-  @visibleForTesting
   JExModel parseJsonBody(String jsObject) => JExModel.fromString(jsObject);
 
-  @visibleForTesting
   String decodeIso8859_1(String isoString) =>
       latin1.decode(isoString.runes.toList());
 
-  @visibleForTesting
   List<String> getHandleCallbackParameters(String bodyContent) {
     List<String> parameters = <String>[];
 
@@ -75,19 +68,53 @@ class ResponseParser {
     bodyContent = bodyContent.substring(nextComma + 1);
 
     // Now, everything belogs to 3rd parameter.
+    // Just remove extra quotes, if exists.
+    bodyContent = removeExtraQuotes(bodyContent);
     parameters.add(bodyContent);
 
     return parameters;
   }
 
-  JExModel parse() {
+  static String removeExtraQuotes(String bodyContent) {
+    int first = 0;
+    int last = bodyContent.length - 1;
+    if (bodyContent[first] == '"' && bodyContent[last] == '"') {
+      return bodyContent.substring(first + 1, last);
+    }
+    return bodyContent;
+  }
+
+  ///
+  /// The JExperts answer is a JS-Object, not a JSON.
+  /// This method add quotes to JS-Object (stringify), to be JSON compliant.
+  ///
+  static String stringify(String jsObject) {
+    // To understand the regexp, consult https://regexr.com/5p7cs
+    // (?!\b\d+\b) negative lookahead: do not match numbers (0, 00, 123)
+    // (?!\b\d+\b) negative lookahead: do not match true
+    // (?!\b\d+\b) negative lookahead: do not match false
+    // (\b[A-zÀ-ú]+\b) match expression: \b matches a word boundary, where
+    //                 word characters might be [A-zÀ-ú]+ lowercase and
+    //                 uppercase characters with accents.
+    String newString = jsObject.replaceAllMapped(
+        RegExp(r'(?!\b\d+\b)(?!\btrue\b)(?!\bfalse\b)(\b[A-zÀ-ú]+\b)'),
+        (Match match) => '"${match.group(0)}"');
+    // Remove double quotes.
+    newString =
+        newString.replaceAllMapped(RegExp(r'("")'), (Match match) => '"');
+    return newString;
+  }
+
+  JExModel parseJExModel() => parseJsonBody(parse());
+
+  String parse() {
     List<String> lines = getLines();
     String handleCallbackLine = getHandleCallbackLine(lines);
     String bodyContent = extractBodyContent(handleCallbackLine);
     List<String> parameters = getHandleCallbackParameters(bodyContent);
+    String body = removeExtraQuotes(parameters[2]);
 
     // The JExperts API use ISO-8859-1
-    String jsObjectBody = decodeIso8859_1(parameters[2]);
-    return parseJsonBody(jsObjectBody);
+    return decodeIso8859_1(body);
   }
 }

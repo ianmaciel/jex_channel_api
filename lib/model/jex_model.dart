@@ -22,7 +22,6 @@
 
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:jex_channel_api/model/jex_day_model.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -150,9 +149,8 @@ class JExModel {
   /// The JExperts answer is a JS-Object, not a JSON.
   /// This method add quotes to JS-Object (stringify), to be JSON compliant.
   ///
-  @visibleForTesting
   static String stringify(String jsObject) {
-    // To undertand the regexp, consult https://regexr.com/5p7cs
+    // To understand the regexp, consult https://regexr.com/5p7cs
     // (?!\b\d+\b) negative lookahead: do not match numbers (0, 00, 123)
     // (?!\b\d+\b) negative lookahead: do not match true
     // (?!\b\d+\b) negative lookahead: do not match false

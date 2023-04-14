@@ -70,9 +70,21 @@ void main() {
     test('should parse the entire response body', () {
       ResponseParser responseParser =
           ResponseParser(ResponseParserFixture.responseBody);
-      JExModel jexModel = responseParser.parse();
+      JExModel jexModel = responseParser.parseJExModel();
       expect(jexModel.formatedEnd, DateTime(2021, 03, 07));
       expect(jexModel.formatedStart, DateTime(2021, 02, 28));
+    });
+    test('should remove extra quotes', () {
+      expect(ResponseParser.removeExtraQuotes('"test"'), 'test');
+      expect(ResponseParser.removeExtraQuotes('test'), 'test');
+      expect(ResponseParser.removeExtraQuotes('"test "2""'), 'test "2"');
+      expect(ResponseParser.removeExtraQuotes('test "2"'), 'test "2"');
+      // ignore: prefer_single_quotes
+      expect(ResponseParser.removeExtraQuotes("\"test \"12324\" dhdiushfds \""),
+          'test "12324" dhdiushfds ');
+      // ignore: prefer_single_quotes
+      expect(ResponseParser.removeExtraQuotes("test \"12324\" dhdiushfds "),
+          'test "12324" dhdiushfds ');
     });
   });
 }

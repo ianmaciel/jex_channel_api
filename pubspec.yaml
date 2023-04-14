@@ -41,19 +41,10 @@ environment:
   flutter: "^2.0.1"
 
 dependencies:
-  flutter:
-    sdk: flutter
-  intl: ^0.17.0
-  requests: ^4.0.0
+  html: ^0.15.2
+  intl: ^0.18.0
+  requests: ^4.7.0
   json_annotation: ^4.0.1
-
-dependency_overrides:
-  requests:
-    path: ../requests/
-  # requests:
-  #   git:
-  #     url: git://github.com/ianmaciel/requests.git
-  #     ref: feature/null-safety
 
 dev_dependencies:
   test:

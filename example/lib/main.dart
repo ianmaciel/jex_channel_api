@@ -46,6 +46,7 @@ class _LoginStatusState extends State<LoginStatus> {
 
   void loginCallback(bool result) {
     setState(() => isLogged = result);
+    jExChannel.getAppointments().then(print);
   }
 
   @override

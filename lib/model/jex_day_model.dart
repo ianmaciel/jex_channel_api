@@ -22,7 +22,6 @@
 
 import 'dart:developer';
 
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -75,7 +74,6 @@ class JExDayModel {
   @JsonKey(name: 'dia', fromJson: parseDateTime)
   final DateTime day;
 
-  @visibleForTesting
   static Duration parseHHMM(String duration) {
     // Check the duration content.
     if (!RegExp(r'\b[0-9][0-9]\b:\b[0-5][0-9]\b').hasMatch(duration)) {

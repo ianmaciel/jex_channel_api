@@ -6,6 +6,12 @@
             "program": "example/lib/main.dart",
             "request": "launch",
             "type": "dart"
+        },
+        {
+            "name": "example (Dart)",
+            "program": "dart_example/main.dart",
+            "request": "launch",
+            "type": "dart"
         }
     ]
 }
