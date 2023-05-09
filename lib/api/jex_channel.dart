@@ -22,8 +22,8 @@
 
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
-
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:jex_channel_api/api/response_parser.dart';
 import 'package:jex_channel_api/core/dwr.dart';
 import 'package:requests/requests.dart';
@@ -234,7 +234,98 @@ scriptSessionId=$scriptSessionId
     return responseParser.parse();
   }
 
-  Future<String> createAppointment() async {
+  Future<String> createAppointment({
+    required DateTime start,
+    DateTime? end,
+    Duration? duration,
+    String description = '',
+  }) async {
+    assert(end != null || duration != null);
+    assert(duration == null ||
+        end!.difference(start).inMinutes == duration.inMinutes);
+
+    if (end == null) {
+      end = start.add(duration!);
+    }
+    if (duration == null) {
+      duration = end.difference(start);
+    }
+
+    const String endpoint = 'apontamento.do';
+
+    if (!isLogged) {
+      throw Exception('Unauthenticated');
+    }
+
+    DateFormat dateFormat = DateFormat('dd/MM/yyyy');
+    DateFormat timeFormat = DateFormat('HH:mm');
+
+    http.Response response = await Requests.post(
+      '$baseAddress/$endpoint',
+      headers: <String, String>{
+        'accept': '*/*',
+        'accept-language': 'pt,en-US;q=0.9,en;q=0.8',
+        'content-type': 'application/x-www-form-urlencoded',
+        'Origin': 'https://channel.certi.org.br',
+        'sec-ch-ua':
+            'Google Chrome";v="89", "Chromium";v="89", ";Not A Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': 'Linux',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        'Referer':
+            'https://channel.certi.org.br/channel/apontamento.do?action=novoApontamento',
+        'User-Agent':
+            'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36',
+      },
+      body: <String, String?>{
+        'apontamento.id': '',
+        'participanteSelecionado': '',
+        'destino': 'timesheet',
+        'key': '-1',
+        'idUsuario': '',
+        'retornaHomologacao': '',
+        'superiorStaff': '',
+        'action': 'salvar',
+        'destinoForward': '',
+        'IEA': '',
+        'apontamento.comentario': description,
+        'tipoApontamento': '2',
+        'areaProjeto': '53',
+        'apontamento.projetosSelecionado': '0',
+        'centro_de_custo': '',
+        'apontamento.idTipoAtividadeProjeto': '-1',
+        'apontamento.notificacaoSelecionada': '0',
+        'apontamento.idTarefa': '0',
+        'areaOperacao': '53',
+        'apontamento.idOperacao': '0',
+        'apontamento.clientesSelecionado': '0',
+        'apontamento.idTipoAtividadeOperacao': '0',
+        'apontamento.idPassoWorkflow': '0',
+        'apontamento.idTicket': '0',
+        'apontamento.idTarefaTicket': '0',
+        'apontamento.clienteSelecionadoAvulso': '1',
+        'apontamento.tipoOperacaoSelecionado': '0',
+        'apontamento.idTipoAtividadeAvulso': '-1',
+        'apontamento.isHoraExtraSelecionada': '0',
+        'data': dateFormat.format(start),
+        'apontamento.horaInicio': timeFormat.format(start),
+        'apontamento.horaFim': timeFormat.format(end),
+        'apontamento.duracao': printDuration(duration),
+        'jexptoken': '$jExpToken',
+      },
+      bodyEncoding: RequestBodyEncoding.FormURLEncoded,
+      withCredentials: true,
+    );
+
+    return response.body.toString();
+  }
+
+  String printDuration(Duration duration) =>
+      '${duration.inHours}:${duration.inMinutes}';
+
+  Future<String> createHardcodedAppointment() async {
     const String endpoint = 'apontamento.do';
 
     if (!isLogged) {

@@ -14,8 +14,12 @@ main() async {
 
   await jExChannel.getJexpToken();
   print('create appointment:');
-  String createAppointment = await jExChannel.createAppointment();
+  String createAppointment = await jExChannel.createHardcodedAppointment();
   print('$createAppointment\n');
+
+  // print('get appointments:');
+  // String appointments = await jExChannel.getAppointments();
+  // print('$appointments\n');
 
   print('get projects:');
   String projetos = await jExChannel.getProjectAjax();
